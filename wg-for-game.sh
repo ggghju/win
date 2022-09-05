@@ -90,8 +90,8 @@ wireguard_install(){
     echo "net.ipv4.ip_forward = 1" > /etc/sysctl.conf
     mkdir /etc/udp
     cd /etc/udp
-	curl -o udp2raw https://github.com/ggghju/win/blob/main/udp2raw
-	curl -o speederv2 https://github.com/ggghju/win/blob/main/speederv2
+	curl -o udp2raw https://raw.githubusercontent.com/ggghju/win/master/udp2raw
+	curl -o speederv2 https://raw.githubusercontent.com/ggghju/win/master/speederv2
 	chmod +x speederv2 udp2raw
 	
 	cat > /etc/wireguard/wg0.conf <<-EOF
