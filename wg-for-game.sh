@@ -31,8 +31,8 @@ checkos(){
 
 
 
-1config_client(){
-1cat > /etc/wireguard/client.conf <<-EOF
+5config_client(){
+5cat > /etc/wireguard/client.conf <<-EOF
 [Interface]
 PrivateKey = $c1
 Address = 10.0.0.2/24 
@@ -53,7 +53,7 @@ EOF
 }
 
 #Install Wireguard
-1wireguard_install(){
+5wireguard_install(){
     # Install WireGuard tools and module
 	if [[ ${OS} == 'ubuntu' ]]; then
 		apt-get update
@@ -77,8 +77,8 @@ EOF
 	fi
 	
 	# Configure Wireguard
-	1mkdir /etc/wireguard
-    1cd /etc/wireguard
+	mkdir /etc/wireguard
+    5cd /etc/wireguard
     wg genkey | tee sprivatekey | wg pubkey > spublickey
     wg genkey | tee cprivatekey | wg pubkey > cpublickey
     s1=$(cat sprivatekey)
@@ -93,9 +93,9 @@ EOF
 	curl -o speederv2 https://raw.githubusercontent.com/ggghju/win/master/speederv2
 	chmod +x speederv2
 	
-	1cat > /etc/wireguard/wg0.conf <<-EOF
+	cat > /etc/wireguard/wg0.conf <<-EOF
 [Interface]
-1PrivateKey = $s1
+PrivateKey = $s1
 Address = 10.0.0.1/24 
 PostUp   = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o $NIC -j MASQUERADE
 PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $NIC -j MASQUERADE
@@ -107,9 +107,9 @@ PublicKey = $c2
 AllowedIPs = 10.0.0.2/32
 EOF
 
-    1config_client
-    1wg-quick up wg0
-    1systemctl enable wg-quick@wg0
+    config_client
+    wg-quick up wg0
+    systemctl enable wg-quick@wg0
 }
 
 # Configure auto start on boot
@@ -118,7 +118,7 @@ auto_start(){
     nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 2 >speeder.log 2>&1 &
     if [ "${OS}" == 'CentOS' ];then
         sed -i '/exit/d' /etc/rc.d/rc.local
-        nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 2 >speeder.log 2>&1 & " >> /etc/rc.d/rc.local
+        echo "nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 2 >speeder.log 2>&1 & " >> /etc/rc.d/rc.local
         chmod +x /etc/rc.d/rc.local
     elif [ -s /etc/rc.local ]; then
         sed -i '/exit/d' /etc/rc.local
@@ -169,4 +169,5 @@ rootness
 checkos
 wireguard_install
 auto_start
+
 
