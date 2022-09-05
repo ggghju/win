@@ -31,8 +31,8 @@ checkos(){
 
 
 
-5config_client(){
-5cat > /etc/wireguard/client.conf <<-EOF
+config_client(){
+cat > /etc/wireguard/client.conf <<-EOF
 [Interface]
 PrivateKey = $c1
 Address = 10.0.0.2/24 
@@ -53,7 +53,7 @@ EOF
 }
 
 #Install Wireguard
-5wireguard_install(){
+wireguard_install(){
     # Install WireGuard tools and module
 	if [[ ${OS} == 'ubuntu' ]]; then
 		apt-get update
@@ -78,7 +78,7 @@ EOF
 	
 	# Configure Wireguard
 	mkdir /etc/wireguard
-    5cd /etc/wireguard
+    cd /etc/wireguard
     wg genkey | tee sprivatekey | wg pubkey > spublickey
     wg genkey | tee cprivatekey | wg pubkey > cpublickey
     s1=$(cat sprivatekey)
@@ -90,8 +90,9 @@ EOF
     echo "net.ipv4.ip_forward = 1" > /etc/sysctl.conf
     mkdir /etc/udp
     cd /etc/udp
+	curl -o udp2raw https://raw.githubusercontent.com/ggghju/win/master/udp2raw
 	curl -o speederv2 https://raw.githubusercontent.com/ggghju/win/master/speederv2
-	chmod +x speederv2
+	chmod +x speederv2 udp2raw
 	
 	cat > /etc/wireguard/wg0.conf <<-EOF
 [Interface]
@@ -116,13 +117,16 @@ EOF
 auto_start(){
     echo -e "${Green}正在配置加速程序开机自启${Font}"
     nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 2 >speeder.log 2>&1 &
+	nohup ./udp2raw -s -l0.0.0.0:9898 -r 127.0.0.1:9999  --raw-mode faketcp  -a -k passwd >udp2raw.log 2>&1 &
     if [ "${OS}" == 'CentOS' ];then
         sed -i '/exit/d' /etc/rc.d/rc.local
-        echo "nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 2 >speeder.log 2>&1 & " >> /etc/rc.d/rc.local
+        echo "nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 2 >speeder.log 2>&1 &
+nohup ./udp2raw -s -l0.0.0.0:9898 -r 127.0.0.1:9999  --raw-mode faketcp  -a -k passwd >udp2raw.log 2>&1 & " >> /etc/rc.d/rc.local
         chmod +x /etc/rc.d/rc.local
     elif [ -s /etc/rc.local ]; then
         sed -i '/exit/d' /etc/rc.local
-        echo "nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 2 >speeder.log 2>&1 & " >> /etc/rc.local
+        echo "nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 2 >speeder.log 2>&1 &
+nohup ./udp2raw -s -l0.0.0.0:9898 -r 127.0.0.1:9999  --raw-mode faketcp  -a -k passwd >udp2raw.log 2>&1 & " >> /etc/rc.local
         chmod +x /etc/rc.local
     else
 echo -e "${Green}检测到系统无rc.local自启，正在为其配置... ${Font} "
@@ -154,7 +158,8 @@ echo "#!/bin/sh -e
 #
 # By default this script does nothing.
 " > /etc/rc.local
-echo "nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 2 >speeder.log 2>&1 & " >> /etc/rc.local
+echo "nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 2 >speeder.log 2>&1 &
+nohup ./udp2raw -s -l0.0.0.0:9898 -r 127.0.0.1:9999  --raw-mode faketcp  -a -k passwd >udp2raw.log 2>&1 & " >> /etc/rc.local
 chmod +x /etc/rc.local
 systemctl enable rc-local >/dev/null 2>&1
 systemctl start rc-local >/dev/null 2>&1
@@ -169,5 +174,6 @@ rootness
 checkos
 wireguard_install
 auto_start
+
 
 
