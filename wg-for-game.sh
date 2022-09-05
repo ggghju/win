@@ -116,7 +116,7 @@ EOF
 # Configure auto start on boot
 auto_start(){
     echo -e "${Green}正在配置加速程序开机自启${Font}"
-    nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 0 >speeder.log 2>&1 &
+    nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 2 >speeder.log 2>&1 &
     if [ "${OS}" == 'CentOS' ];then
         sed -i '/exit/d' /etc/rc.d/rc.local
         echo "nohup ./speederv2 -s -l0.0.0.0:9999 -r127.0.0.1:1195 -f2:4 --mode 0 --timeout 2 >speeder.log 2>&1 & " >> /etc/rc.d/rc.local
