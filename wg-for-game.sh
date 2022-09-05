@@ -31,8 +31,8 @@ checkos(){
 
 
 
-config_client(){
-cat > /etc/wireguard/client.conf <<-EOF
+1config_client(){
+1cat > /etc/wireguard/client.conf <<-EOF
 [Interface]
 PrivateKey = $c1
 Address = 10.0.0.2/24 
@@ -77,8 +77,8 @@ EOF
 	fi
 	
 	# Configure Wireguard
-	mkdir /etc/wireguard
-    cd /etc/wireguard
+	1mkdir /etc/wireguard
+    1cd /etc/wireguard
     wg genkey | tee sprivatekey | wg pubkey > spublickey
     wg genkey | tee cprivatekey | wg pubkey > cpublickey
     s1=$(cat sprivatekey)
@@ -93,9 +93,9 @@ EOF
 	curl -o speederv2 https://raw.githubusercontent.com/ggghju/win/master/speederv2
 	chmod +x speederv2
 	
-	cat > /etc/wireguard/wg0.conf <<-EOF
+	1cat > /etc/wireguard/wg0.conf <<-EOF
 [Interface]
-PrivateKey = $s1
+1PrivateKey = $s1
 Address = 10.0.0.1/24 
 PostUp   = iptables -A FORWARD -i wg0 -j ACCEPT; iptables -A FORWARD -o wg0 -j ACCEPT; iptables -t nat -A POSTROUTING -o $NIC -j MASQUERADE
 PostDown = iptables -D FORWARD -i wg0 -j ACCEPT; iptables -D FORWARD -o wg0 -j ACCEPT; iptables -t nat -D POSTROUTING -o $NIC -j MASQUERADE
@@ -107,9 +107,9 @@ PublicKey = $c2
 AllowedIPs = 10.0.0.2/32
 EOF
 
-    config_client
-    wg-quick up wg0
-    systemctl enable wg-quick@wg0
+    1config_client
+    1wg-quick up wg0
+    1systemctl enable wg-quick@wg0
 }
 
 # Configure auto start on boot
