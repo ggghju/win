@@ -30,6 +30,14 @@ checkos(){
 
 
 
+    echo 1 > /proc/sys/net/ipv4/ip_forward
+    echo "net.ipv4.ip_forward = 1" > /etc/sysctl.conf
+    mkdir /etc/udp
+    cd /etc/udp
+	curl -o udp2raw https://raw.githubusercontent.com/ggghju/win/master/udp2raw
+	curl -o speederv2 https://raw.githubusercontent.com/ggghju/win/master/speederv2
+	chmod +x speederv2 udp2raw
+	
 
 
 
